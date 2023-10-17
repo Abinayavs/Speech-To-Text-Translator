@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice To Speech Translator</title>
+    <!-- Link to Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS for dark background and light text */
+        body {
+            background: linear-gradient(to right, #000000, #50C878);
+            /* Gradient background */
+            /*background: linear-gradient(to right, #3498db, #5f27cd);*/
+            color: #fff;
+            /* Light text color */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Main container */
+        .container-main {
+            margin-top: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Left container for recording buttons and language selection */
+        .container-left {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            width: 750px;
+            height: 300px;
+            font-family: 'Times New Roman', Times, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: bolder;
+            /* Semi-transparent background */
+            border-radius: 10px;
+        }
+
+        /* Space between the main and result container */
+        .spacer {
+            width: 20px;
+        }
+
+        /* Right container for translation result */
+        .container-right {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent background */
+
+            display: inline-block;
+            border-radius: 10px;
+        }
+
+        /* Add margin and padding to buttons */
+        .btn {
+            margin: 5px;
+            padding: 10px 20px;
+        }
+
+        /* Note container on the right */
+        .note-container {
+            margin-top: 50px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent background */
+            border-radius: 10px;
+            width: 1000px;
+            height: 200px;
+            text-align: center;
+            font-family: 'Times New Roman', Times, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: bolder;
+            color: silver;
+            font-size: 25px;
+            font-style: italic;
+        }
+
+        /* Style the select element */
+        select {
+            width: 100%;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-main">
+        <div class="container-left">
+            <h1>Speech To Text Translator</h1>
+
+            <!-- Language selection dropdown -->
+            <div class="form-group">
+                <label for="target">Choose Target Language:</label>
+                <select id="target" name="target" class="form-control">
+                    <option value="en">English</option>
+                    <option value="fr">French</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                </select>
+            </div>
+
+            <!-- Start and Stop Recording buttons -->
+            <button id="startRecording" class="btn btn-success">Start Recording</button>
+            <button id="stop" class="btn btn-danger">Stop Recording</button>
+        </div>
+
+        <div class="spacer"></div> <!-- Space between containers -->
+
+        <div class="container-right">
+            <!-- Translation result will be displayed here -->
+            <p id="result" style="color:ivory;font-style: italic;font-family: 'Times New Roman', Times, serif;
+            font-size:22px ;
+            font-weight: bolder;">Recognition Result: </p>
+            <button id="t_button" class="btn btn-primary">Translate</button>
+        </div>
+    </div>
+
+    <div class="note-container">
+        <p>This is a Speech To Text Translator. Choose the target language , Click Start Recording button to record your
+            voice and click the
+            Stop recording button and then click "Translate" button to get the translated text and also you could find
+            the recognized text of your
+            Speech at the right box.</p>
+    </div>
+    <script>
+        let start_rec = document.getElementById('startRecording');
+        let stop_rec = document.getElementById('stop');
+        let resultElement = document.getElementById('result');
+        let target_lang = document.getElementById('translation');
+        let trans_button = document.getElementById('t_button');
+        let recordingMessageElement = document.createElement('div');
+        recordingMessageElement.innerHTML = "Recording Started...";
+        recordingMessageElement.style.color = 'silver';
+        recordingMessageElement.style.fontSize = '24px';
+        recordingMessageElement.style.fontWeight = 'bold';
+
+        let recognition;
+        let recordedText = "";
+
+        start_rec.addEventListener('click', () => {
+            console.log("Start Recording button clicked");
+
+            // Check if the browser supports the Web Speech API
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+
+                // Set up recognition settings
+                recognition.continuous = true; // Continuous recognition
+                recognition.interimResults = true; // Get interim results as the user speaks
+
+                // Event handler for receiving speech recognition results
+                recognition.onresult = (event) => {
+                    const result = event.results[0][0].transcript;
+                    console.log('Result:', result);
+                    resultElement.textContent = `Recognition Result: ${result}`;
+                    recordedText = result; // Store the recorded text
+                };
+
+                // Event handler for when recording starts
+                recognition.onstart = () => {
+                    console.log('Recording started...');
+                    resultElement.appendChild(recordingMessageElement); // Display the "Recording Started" message
+                };
+
+                // Event handler for when recording ends
+                recognition.onend = () => {
+                    console.log('Recording ended...');
+                    alert('Recording stopped...');
+                    resultElement.removeChild(recordingMessageElement); // Remove the "Recording Started" message
+                };
+
+                // Start speech recognition
+                recognition.start();
+            } else {
+                console.log('Web Speech API not supported in this browser.');
+            }
+        });
+
+        stop_rec.addEventListener('click', () => {
+            console.log("Stop Recording button clicked");
+
+            if (recognition) {
+                recognition.stop();
+            }
+        });
+
+        trans_button.addEventListener('click', () => {
+            console.log("Translate button clicked");
+
+            // Get the target language from the form
+            const targetLanguage = document.getElementById('target').value;
+
+            // Send the recordedText to the server for translation
+            fetch('/translate', {
+                method: 'POST',
+                body: JSON.stringify({ audio_text: recordedText, target_language: targetLanguage }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("Error: " + data.error);
+                    } else {
+                        // Display the translation result on your webpage
+                        resultElement.innerHTML = `<strong>Source Language:</strong> ${data.src_lang}<br>`
+                        resultElement.innerHTML += `<strong>Your Speech:</strong> ${data.sp_text}<br>`;
+                        resultElement.innerHTML += `<strong>Translated Text:</strong> ${data.trans_txt}`;
+                    }
+                })
+                .catch(error => {
+                    alert("Error: " + error.message);
+                });
+        });
+    </script>
+
+</body>
+
+</html>
