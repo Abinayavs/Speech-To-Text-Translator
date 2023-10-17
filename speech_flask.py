@@ -14,42 +14,6 @@ audio_text = ""
 def speech():
     return render_template("speech.html")
 
-'''@speech_flask.route("/start_record", methods=["GET"])
-def start_record():
-    global audio_text
-
-    global recording
-    
-    try:
-        if not recording:
-            recording = True
-            audio_text = ""  # Clear previous recorded text
-            return jsonify({"message": "Recording Started"})
-            rec = speech.Recognizer()
-            with speech.Microphone() as source:
-                audio = rec.listen(source)
-            audio_text = rec.recognize_google(audio)
-        else:
-            return jsonify({"error": "Recording is already in progress"})
-    except Exception as e:
-        return jsonify({"error": str(e)})
-    
-    
-
-
-@speech_flask.route("/stop_record", methods=["GET"])
-def stop_record():
-    global recording, audio_text
-
-    try:
-        if recording:
-            recording = False
-            
-            return jsonify({"message": "Recording stopped"})
-        else:
-            return jsonify({"error": "No recording in progress"})
-    except Exception as e:
-        return jsonify({"error": str(e)})'''
 
 @speech_flask.route("/translate", methods=["POST"])
 def translate_text():
